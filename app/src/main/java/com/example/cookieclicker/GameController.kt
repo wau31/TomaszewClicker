@@ -52,6 +52,7 @@ class GameController {
 
     private fun tick() {
         time += 1000
+
         onTick.invoke(time.toString())
         System.out.println(time)
 
