@@ -1,5 +1,7 @@
 package com.example.cookieclicker
 
+import android.app.Activity
+import android.content.Context
 import java.util.*
 
 class Event<T> {
@@ -31,6 +33,12 @@ class GameController {
 
     val list = listOf(SimpleClickPointGenerator(), TimeBasedPointGenerator(), ClickHoldPointGenerator())
 
+    private var ContextActivity:Context
+
+    constructor(activity: Context){
+
+        this.ContextActivity = activity
+    }
 
     fun StartGame() {
         val timer = Timer(true)
@@ -56,7 +64,16 @@ class GameController {
     }
 
     private fun CheckForHighScore() {
+        val settings = ContextActivity.getSharedPreferences(ContextActivity.getString(R.string.app_settings_path), Context.MODE_PRIVATE)
+        var highscores=settings.getStringSet("HighScores", mutableSetOf())
+        for (string in highscores)
+        {
+            if(string.toInt()>time)
+            {
 
+            }
+
+        }
     }
 
     fun GrantPoints(generator: IPointsGenerator) {

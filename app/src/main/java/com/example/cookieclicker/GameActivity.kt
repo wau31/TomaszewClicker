@@ -1,14 +1,12 @@
 package com.example.cookieclicker
 
 import android.os.Bundle
-import android.os.CountDownTimer
-import android.os.PersistableBundle
 import android.support.v7.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_game.*
 
 class GameActivity : AppCompatActivity() {
 
-    private val controller = GameController()
+    private var controller = GameController(this, null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
