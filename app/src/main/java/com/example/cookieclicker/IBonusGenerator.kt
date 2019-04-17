@@ -1,6 +1,6 @@
 package com.example.cookieclicker
 
-interface IPointsGenerator {
+interface IBonusGenerator {
 
     val bonus:Float
     val upgradeCost:Float
