@@ -24,6 +24,7 @@ class Event<T> {
 
 class GameController {
     var highScores= arrayListOf<HighScore>()
+
     //GameEvents to be implemented
     val onGameFinished = Event<String>()
     val onPointsChanged = Event<String>()
@@ -53,30 +54,7 @@ class GameController {
         onGameFinished.invoke("End!")
     }
 
-    private fun ReadFile(){
-        var json:String?=null
-        try {
-            val inputStream: InputStream = ContextActivity.assets.open("TomaszewClickerConfig.json")
-            json = inputStream.bufferedReader().use { it.readText() }
-            var jsonArr=JSONObject(json).getJSONArray("Highscores")
-            for(i in 0 until jsonArr.length())
-            {
-                var jsonObject=jsonArr.getJSONObject(i)
-                highScores.add(HighScore(jsonObject.getString("name"),jsonObject.getInt("score")))
-            }
-        }
-        catch (e:Exception)
-        {
-
-        }
-    }
-    private fun WriteFile(){
-
-    }
-
     fun checkForHighScore() {
-        ReadFile()
-        highScores.add(HighScore())
 
     }
 
