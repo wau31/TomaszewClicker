@@ -1,6 +1,14 @@
-package com.example.cookieclicker
+package com.example.cookieclicker.controllers
 
 import android.content.Context
+import com.example.cookieclicker.controllers.bonusGenerators.ClickHoldPointGenerator
+import com.example.cookieclicker.controllers.bonusGenerators.IBonusGenerator
+import com.example.cookieclicker.controllers.bonusGenerators.SimpleClickPointGenerator
+import com.example.cookieclicker.controllers.bonusGenerators.TimeBasedPointGenerator
+import com.example.cookieclicker.models.HighScore
+import org.json.JSONObject
+import java.io.InputStream
+import java.lang.Exception
 
 class Event<T> {
     private val handlers = arrayListOf<(Event<T>.(T) -> Unit)>()
@@ -15,63 +23,73 @@ class Event<T> {
 
 
 class GameController {
-
+    var highScores= arrayListOf<HighScore>()
     //GameEvents to be implemented
-    val onGameStarted = Event<String>()
     val onGameFinished = Event<String>()
     val onPointsChanged = Event<String>()
-    val onTick = Event<String>()
 
     //VariableFields
     var score = 0f
-    var time = 0;
-    val scoreLimit = 1000;
-    private val interval = 1000L;
+    private val scoreLimit = 1000;
+
     //
 
-    val list = listOf(SimpleClickPointGenerator(), TimeBasedPointGenerator(), ClickHoldPointGenerator())
+    val list = listOf(
+        SimpleClickPointGenerator(),
+        TimeBasedPointGenerator(),
+        ClickHoldPointGenerator()
+    )
 
+    //should i use it?
     private var ContextActivity: Context
 
     constructor(activity: Context) {
         this.ContextActivity = activity
     }
 
-    fun StartGame() {
-        onGameStarted.invoke("Start!")
-    }
 
-
-    private fun FinnishGame() {
-
-        CheckForHighScore()
+    private fun finnishGame() {
+        checkForHighScore()
         onGameFinished.invoke("End!")
     }
 
-    private fun CheckForHighScore() {
-        val settings = ContextActivity.getSharedPreferences(
-            ContextActivity.getString(R.string.app_settings_path),
-            Context.MODE_PRIVATE
-        )
-        var highscores = settings.getStringSet("HighScores", mutableSetOf())
-        for (string in highscores) {
-            if (string.toInt() > time) {
-
+    private fun ReadFile(){
+        var json:String?=null
+        try {
+            val inputStream: InputStream = ContextActivity.assets.open("TomaszewClickerConfig.json")
+            json = inputStream.bufferedReader().use { it.readText() }
+            var jsonArr=JSONObject(json).getJSONArray("Highscores")
+            for(i in 0 until jsonArr.length())
+            {
+                var jsonObject=jsonArr.getJSONObject(i)
+                highScores.add(HighScore(jsonObject.getString("name"),jsonObject.getInt("score")))
             }
+        }
+        catch (e:Exception)
+        {
 
         }
     }
+    private fun WriteFile(){
 
-    fun GrantPoints(generator: IBonusGenerator) {
+    }
+
+    fun checkForHighScore() {
+        ReadFile()
+        highScores.add(HighScore())
+
+    }
+
+    fun grantPoints(generator: IBonusGenerator) {
         score += generator.GrantPoints()
         System.out.println(score)
         onPointsChanged.invoke(score.toString())
         if (score >= scoreLimit) {
-            FinnishGame()
+            finnishGame()
         }
     }
 
-    fun Upgrade(generator: IBonusGenerator) {
+    fun upgrade(generator: IBonusGenerator) {
         if (score >= generator.upgradeCost) {
             score -= generator.upgradeCost
             onPointsChanged.invoke(score.toString())

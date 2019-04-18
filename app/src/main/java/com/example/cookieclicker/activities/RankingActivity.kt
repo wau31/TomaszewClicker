@@ -1,12 +1,12 @@
-package com.example.cookieclicker
+package com.example.cookieclicker.activities
 
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.support.v7.app.AppCompatActivity
+import com.example.cookieclicker.R
 
 class RankingActivity: AppCompatActivity(){
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_ranking)
     }
 }

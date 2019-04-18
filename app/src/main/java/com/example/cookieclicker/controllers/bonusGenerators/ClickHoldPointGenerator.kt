@@ -1,6 +1,6 @@
-package com.example.cookieclicker
+package com.example.cookieclicker.controllers.bonusGenerators
 
-class ClickHoldPointGenerator:IBonusGenerator {
+class ClickHoldPointGenerator: IBonusGenerator {
 
     override val bonus: Float
         get() = _bonuses[currentBonusIndex]

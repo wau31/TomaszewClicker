@@ -1,0 +1,50 @@
+{
+  "RunInBackground": false,
+  "HihscoresToDisplay": "10",
+  "Highscores": [
+    {
+      "name": "Adam",
+      "score": 1000
+    },
+    {
+      "name": "Bartek",
+      "score": 2000
+    },
+    {
+      "name": "Tomek",
+      "score": 3000
+    },
+    {
+      "name": "Krzysiek",
+      "score": 4000
+    },
+    {
+      "name": "Damian",
+      "score": 5000
+    },
+    {
+      "name": "Paweł",
+      "score": 6000
+    },
+    {
+      "name": "Artur",
+      "score": 7000
+    },
+    {
+      "name": "Stefan",
+      "score": 8000
+    },
+    {
+      "name": "Ferdek",
+      "score": 9000
+    },
+    {
+      "name": "Weronika",
+      "score": 10000
+    },
+    {
+      "name": "Paulina",
+      "score": 11000
+    }
+  ]
+}

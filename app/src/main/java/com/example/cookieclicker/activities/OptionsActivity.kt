@@ -1,19 +1,25 @@
-package com.example.cookieclicker
+package com.example.cookieclicker.activities
 
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
+import com.example.cookieclicker.R
 import kotlinx.android.synthetic.main.activity_options.*
 
-class OptionsActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
-        setContentView(R.layout.activity_options)
-        switch1.setOnCheckedChangeListener { buttonView, isChecked ->
 
-            val preferences = PreferenceManager.getDefaultSharedPreferences(this)
-            var editor = preferences.edit()
+class OptionsActivity : AppCompatActivity() {
+
+
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_options)
+
+        val preferences = PreferenceManager.getDefaultSharedPreferences(this)
+        switch1.isChecked=preferences.getBoolean("RunInBackground",false)
+
+        switch1.setOnCheckedChangeListener { _, isChecked ->
+            val editor = preferences.edit()
             if (isChecked) {
                 editor.putBoolean("RunInBackground", true)
             } else {

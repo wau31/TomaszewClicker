@@ -6,7 +6,7 @@
                                              android:layout_height="match_parent" android:id="@+id/upgradeSpinner">
 
     <Button
-            android:text="Button1"
+            android:text="Code in JAva"
             android:layout_width="161dp"
             android:layout_height="wrap_content"
             android:id="@+id/cookieButton1"
@@ -14,7 +14,7 @@
             app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toStartOf="parent"
             android:layout_marginLeft="24dp" android:layout_marginStart="24dp"/>
     <Button
-            android:text="Button2"
+            android:text="Code in C#"
             android:layout_width="162dp"
             android:layout_height="wrap_content"
             android:id="@+id/cookieButton2"

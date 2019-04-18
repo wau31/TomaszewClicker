@@ -1,4 +1,4 @@
-package com.example.cookieclicker
+package com.example.cookieclicker.controllers.bonusGenerators
 
 interface IBonusGenerator {
 
