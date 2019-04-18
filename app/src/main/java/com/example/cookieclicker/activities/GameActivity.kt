@@ -26,6 +26,8 @@ class GameActivity : AppCompatActivity() {
     private var chronometerRunning = false;
     var chronometerPauseOffset = 0L
 
+
+
     lateinit var leftImage:ImageView
     lateinit var rightImage:ImageView
     lateinit var spinner:Spinner
@@ -48,10 +50,11 @@ class GameActivity : AppCompatActivity() {
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 var item=parent?.getItemAtPosition(position)
-                controller.list.
+                //controller.list.
             }
 
         }
+
 
 
 
