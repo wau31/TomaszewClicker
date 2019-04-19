@@ -13,14 +13,16 @@
             android:layout_width="134dp"
             android:id="@+id/NewGameButton" android:layout_marginTop="204dp"
             app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginLeft="148dp" android:layout_marginStart="148dp"/>
+            android:layout_marginLeft="148dp" android:layout_marginStart="148dp"
+            android:background="@color/colorAccent" android:textColor="@android:color/white"/>
     <Button
             android:text="Options"
             android:layout_height="wrap_content"
             android:layout_width="134dp"
             android:id="@+id/OptionsButton" app:layout_constraintStart_toStartOf="parent"
             android:layout_marginLeft="148dp" android:layout_marginStart="148dp"
-            android:layout_marginTop="40dp" app:layout_constraintTop_toBottomOf="@+id/RankingButton"/>
+            android:layout_marginTop="40dp" app:layout_constraintTop_toBottomOf="@+id/RankingButton"
+            android:background="@color/colorAccent" android:textColor="@android:color/white"/>
     <Button
             android:text="Exit"
             android:layout_height="wrap_content"
@@ -28,13 +30,15 @@
             android:id="@+id/ExitButton" android:layout_marginTop="40dp"
             app:layout_constraintTop_toBottomOf="@+id/OptionsButton" app:layout_constraintStart_toStartOf="parent"
             android:layout_marginLeft="148dp" android:layout_marginStart="148dp" android:layout_marginBottom="8dp"
-            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintVertical_bias="0.0"/>
+            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintVertical_bias="0.0"
+            android:background="@color/colorAccent" android:textColor="@android:color/white"/>
     <Button
             android:text="Ranking"
             android:layout_height="wrap_content"
             android:layout_width="133dp"
             android:id="@+id/RankingButton" android:layout_marginTop="40dp"
             app:layout_constraintTop_toBottomOf="@+id/NewGameButton" app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginLeft="148dp" android:layout_marginStart="148dp"/>
+            android:layout_marginLeft="148dp" android:layout_marginStart="148dp"
+            android:background="@color/colorAccent" android:textColor="@android:color/white"/>
 
 </android.support.constraint.ConstraintLayout>

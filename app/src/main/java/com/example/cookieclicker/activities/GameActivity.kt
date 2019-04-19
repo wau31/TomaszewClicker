@@ -1,14 +1,17 @@
 package com.example.cookieclicker.activities
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.SystemClock
 import android.preference.PreferenceManager
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.*
 import com.example.cookieclicker.controllers.GameController
 import com.example.cookieclicker.R
 import kotlinx.android.synthetic.main.activity_game.*
+import kotlinx.android.synthetic.main.dialog_username.*
 
 class GameActivity : AppCompatActivity() {
     /*concepts of upgrades:
@@ -27,31 +30,33 @@ class GameActivity : AppCompatActivity() {
     private var chronometerPauseOffset = 0L
 
 
+    private lateinit var leftImage: ImageView
+    private lateinit var rightImage: ImageView
+    private lateinit var spinner: Spinner
 
-    private lateinit var leftImage:ImageView
-    private lateinit var rightImage:ImageView
-    private lateinit var spinner:Spinner
-
+    @SuppressLint("InflateParams")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
 
-        leftImage=findViewById(R.id.LeftImageView)
-        rightImage=findViewById(R.id.RightImageView)
+        leftImage = findViewById(R.id.LeftImageView)
+        rightImage = findViewById(R.id.RightImageView)
 
-        spinner=findViewById(R.id.spinner)
-        val adapter=ArrayAdapter(this,
-            R.layout.support_simple_spinner_dropdown_item,controller.list)
+        spinner = findViewById(R.id.spinner)
+        val adapter = ArrayAdapter(
+            this,
+            R.layout.support_simple_spinner_dropdown_item, controller.list
+        )
         adapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item)
-        spinner.adapter=adapter
+        spinner.adapter = adapter
 
-        spinner.onItemSelectedListener=object:AdapterView.OnItemSelectedListener{
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
 
             }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                var item=parent?.getItemAtPosition(position)
+                var item = parent?.getItemAtPosition(position)
                 //controller.Upgrade()
             }
         }
@@ -74,43 +79,51 @@ class GameActivity : AppCompatActivity() {
             return@setOnLongClickListener true
         }
 
-        startButton.setOnClickListener {
+        val dialog = AlertDialog.Builder(this)
+        val alertView = layoutInflater.inflate(R.layout.dialog_username, null)
+        val username: EditText = alertView.findViewById(R.id.username_text)
+        val start = alertView.findViewById<Button>(R.id.start)
+        var alertDialog=dialog.setView(alertView).create()
+
+        start.setOnClickListener {
+            if (!username.text.toString().isEmpty()) {
+                controller.username = username.text.toString()
+                finnishActivity()
+            }
             startActivity()
+            alertDialog.dismiss()
         }
 
-        finnishActivity()
+        alertDialog.show()
     }
 
 
     override fun onPause() {
         super.onPause()
-        if(!PreferenceManager.getDefaultSharedPreferences(this).getBoolean("RunInBackground",false))
-        {
+        if (!PreferenceManager.getDefaultSharedPreferences(this).getBoolean("RunInBackground", false)) {
             stopChronometer()
         }
     }
 
     override fun onResume() {
         super.onResume()
-        startChronometer()
+        //startChronometer()
     }
 
-    private fun handleAnimation(ImageView:ImageView){
+    private fun handleAnimation(ImageView: ImageView) {
         ImageView.clearAnimation()
-        ImageView.animate().translationYBy(-300f).scaleX(1.2f).scaleY(1.2f).alpha(0f).duration=500
+        ImageView.animate().translationYBy(-300f).scaleX(1.2f).scaleY(1.2f).alpha(0f).duration = 500
 
     }
 
     private fun startActivity() {
         controller.checkForHighScore()
-        startButton.isEnabled = false
-        startButton.visibility = View.GONE
 
         cookieButton1.isEnabled = true
-        cookieButton1.visibility=View.VISIBLE
+        cookieButton1.visibility = View.VISIBLE
 
         cookieButton2.isEnabled = true
-        cookieButton2.visibility=View.VISIBLE
+        cookieButton2.visibility = View.VISIBLE
 
         startChronometer()
 
@@ -119,14 +132,11 @@ class GameActivity : AppCompatActivity() {
 
     private fun finnishActivity() {
 
-        startButton.isEnabled = true
-        startButton.visibility = View.VISIBLE
-
         cookieButton1.isEnabled = false
-        cookieButton1.visibility=View.GONE
+        cookieButton1.visibility = View.GONE
 
         cookieButton2.isEnabled = false
-        cookieButton2.visibility=View.GONE
+        cookieButton2.visibility = View.GONE
 
         stopChronometer()
 

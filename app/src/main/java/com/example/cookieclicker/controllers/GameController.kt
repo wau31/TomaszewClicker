@@ -5,10 +5,6 @@ import com.example.cookieclicker.controllers.bonusGenerators.ClickHoldPointGener
 import com.example.cookieclicker.controllers.bonusGenerators.IBonusGenerator
 import com.example.cookieclicker.controllers.bonusGenerators.SimpleClickPointGenerator
 import com.example.cookieclicker.controllers.bonusGenerators.TimeBasedPointGenerator
-import com.example.cookieclicker.models.HighScore
-import org.json.JSONObject
-import java.io.InputStream
-import java.lang.Exception
 
 class Event<T> {
     private val handlers = arrayListOf<(Event<T>.(T) -> Unit)>()
@@ -23,7 +19,6 @@ class Event<T> {
 
 
 class GameController {
-    var highScores= arrayListOf<HighScore>()
 
     //GameEvents to be implemented
     val onGameFinished = Event<String>()
@@ -32,7 +27,7 @@ class GameController {
     //VariableFields
     var score = 0f
     private val scoreLimit = 1000;
-
+    var username = "Anonymous"
     //
 
     val list = listOf(
