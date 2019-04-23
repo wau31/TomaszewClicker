@@ -1,11 +1,9 @@
 package com.example.cookieclicker.controllers
 
 import android.content.Context
-import com.example.cookieclicker.controllers.bonusGenerators.ClickHoldPointGenerator
-import com.example.cookieclicker.controllers.bonusGenerators.IBonusGenerator
-import com.example.cookieclicker.controllers.bonusGenerators.SimpleClickPointGenerator
-import com.example.cookieclicker.controllers.bonusGenerators.TimeBasedPointGenerator
+import com.example.cookieclicker.controllers.bonusGenerators.*
 
+//C# Events equivalent
 class Event<T> {
     private val handlers = arrayListOf<(Event<T>.(T) -> Unit)>()
     fun plusAssign(handler: Event<T>.(T) -> Unit) {
@@ -20,20 +18,27 @@ class Event<T> {
 
 class GameController {
 
-    //GameEvents to be implemented
+    //GameEvents
     val onGameFinished = Event<String>()
     val onPointsChanged = Event<String>()
+    val onTimeModified=Event<Long>()
+    //
 
     //VariableFields
     var score = 0f
     private val scoreLimit = 1000;
     var username = "Anonymous"
+    private var incomeModifier = 1f
     //
 
+    //Here all interactables are gathered
     val list = listOf(
         SimpleClickPointGenerator(),
+        ClickHoldPointGenerator(),
         TimeBasedPointGenerator(),
-        ClickHoldPointGenerator()
+        IncomeModifier(this),
+        TimeModifier(this)
+
     )
 
     //should i use it?
@@ -53,8 +58,13 @@ class GameController {
 
     }
 
+    fun changeIncomeModifier(newModifier: Float) {
+        incomeModifier = newModifier;
+    }
+
     fun grantPoints(generator: IBonusGenerator) {
-        score += generator.GrantPoints()
+        score += (generator.GrantPoints()) * incomeModifier
+
         System.out.println(score)
         onPointsChanged.invoke(score.toString())
         if (score >= scoreLimit) {

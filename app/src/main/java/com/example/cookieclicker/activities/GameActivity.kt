@@ -10,6 +10,7 @@ import android.view.View
 import android.widget.*
 import com.example.cookieclicker.controllers.GameController
 import com.example.cookieclicker.R
+import com.example.cookieclicker.controllers.bonusGenerators.IBonusGenerator
 import kotlinx.android.synthetic.main.activity_game.*
 import kotlinx.android.synthetic.main.dialog_username.*
 
@@ -42,6 +43,31 @@ class GameActivity : AppCompatActivity() {
         leftImage = findViewById(R.id.LeftImageView)
         rightImage = findViewById(R.id.RightImageView)
 
+        setupChronometer()
+        setupUpgradesList()
+        setupButtons()
+
+        controller.onPointsChanged.plusAssign { scoreCurrent.text = controller.score.toString() }
+        controller.onGameFinished.plusAssign { finnishActivity() }
+
+        displayIntroductionPopup()
+    }
+
+    fun setupButtons() {
+        cookieButton1.setOnClickListener {
+            controller.grantPoints(controller.list[0])
+            handleAnimation(leftImage)
+            System.out.println("Simple click")
+        }
+        cookieButton2.setOnLongClickListener {
+            controller.grantPoints(controller.list[1])
+            handleAnimation(rightImage)
+            System.out.println("Long click")
+            return@setOnLongClickListener true
+        }
+    }
+
+    fun setupUpgradesList() {
         spinner = findViewById(R.id.spinner)
         val adapter = ArrayAdapter(
             this,
@@ -49,7 +75,6 @@ class GameActivity : AppCompatActivity() {
         )
         adapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item)
         spinner.adapter = adapter
-
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
 
@@ -57,33 +82,26 @@ class GameActivity : AppCompatActivity() {
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 var item = parent?.getItemAtPosition(position)
-                //controller.Upgrade()
+                if (item is IBonusGenerator) {
+                    controller.upgrade(item)
+                }
             }
         }
+    }
 
-        controller.onPointsChanged.plusAssign { scoreCurrent.text = controller.score.toString() }
-        controller.onGameFinished.plusAssign { finnishActivity() }
-
+    fun setupChronometer() {
         chronometer = findViewById(R.id.chronometer)
+        chronometer.setOnChronometerTickListener { controller.grantPoints(controller.list[2]) }
+        controller.onTimeModified.plusAssign { modifyChronometerTime(it) }
 
-        cookieButton1.setOnClickListener {
-            controller.grantPoints(controller.list[0])
-            handleAnimation(leftImage)
-            System.out.println("Simple click")
-        }
+    }
 
-        cookieButton2.setOnLongClickListener {
-            controller.grantPoints(controller.list[1])
-            handleAnimation(rightImage)
-            System.out.println("Long click")
-            return@setOnLongClickListener true
-        }
-
+    fun displayIntroductionPopup() {
         val dialog = AlertDialog.Builder(this)
         val alertView = layoutInflater.inflate(R.layout.dialog_username, null)
         val username: EditText = alertView.findViewById(R.id.username_text)
         val start = alertView.findViewById<Button>(R.id.start)
-        var alertDialog=dialog.setView(alertView).create()
+        var alertDialog = dialog.setView(alertView).create()
 
         start.setOnClickListener {
             if (!username.text.toString().isEmpty()) {
@@ -97,7 +115,11 @@ class GameActivity : AppCompatActivity() {
         alertDialog.show()
     }
 
+    override fun onStart() {
+        super.onStart()
+        startChronometer()
 
+    }
     override fun onPause() {
         super.onPause()
         if (!PreferenceManager.getDefaultSharedPreferences(this).getBoolean("RunInBackground", false)) {
@@ -107,7 +129,7 @@ class GameActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        //startChronometer()
+        startChronometer()
     }
 
     private fun handleAnimation(ImageView: ImageView) {
@@ -117,16 +139,12 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun startActivity() {
-        controller.checkForHighScore()
 
         cookieButton1.isEnabled = true
         cookieButton1.visibility = View.VISIBLE
 
         cookieButton2.isEnabled = true
         cookieButton2.visibility = View.VISIBLE
-
-        startChronometer()
-
 
     }
 
@@ -156,6 +174,10 @@ class GameActivity : AppCompatActivity() {
             chronometerPauseOffset = SystemClock.elapsedRealtime() - chronometer.base
             chronometerRunning = false
         }
+    }
+
+    private fun modifyChronometerTime(mod: Long) {
+        chronometer.base += mod
     }
 
 }

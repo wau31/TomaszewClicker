@@ -9,15 +9,11 @@ import java.io.InputStream
 import java.io.OutputStreamWriter
 import java.lang.Exception
 
-class ReadWriteController {
+class ReadWriteController(activity: Context) {
 
     private var highScores = arrayListOf<HighScore>()
 
-    private var contextActivity: Context
-
-    constructor(activity: Context) {
-        this.contextActivity = activity
-    }
+    private var contextActivity: Context = activity
 
     fun getHighScores(): ArrayList<HighScore> {
         if (highScores.isNullOrEmpty()) {
@@ -41,9 +37,6 @@ class ReadWriteController {
         var json: String? = null
 
         try {
-
-            //val inputStream: InputStream = contextActivity.assets.open("TomaszewClickerConfig.json")
-            val s=contextActivity.filesDir
             val inputStream: InputStream = contextActivity.openFileInput("TomaszewClickerConfig.json")
 
             json = inputStream.bufferedReader().use { it.readText() }

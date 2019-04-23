@@ -19,7 +19,7 @@ class SimpleClickPointGenerator: IBonusGenerator {
 
     override fun toString(): String {
         if (currentBonusIndex+1>_bonuses.lastIndex) return "Maximum upgrade reached"
-        return "Upgrade to Java to Java ${_displayStrings[currentBonusIndex]}: ClickBonus->${_bonuses[currentBonusIndex+1]} for ${_costs[currentBonusIndex+1]}"
+        return "Upgrade to Java ${_displayStrings[currentBonusIndex]}: ClickBonus->${_bonuses[currentBonusIndex+1]} for ${_costs[currentBonusIndex+1]}"
     }
 
 
