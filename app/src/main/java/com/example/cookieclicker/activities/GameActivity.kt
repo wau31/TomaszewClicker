@@ -7,6 +7,8 @@ import android.preference.PreferenceManager
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import android.view.WindowManager
+import android.view.animation.AnimationUtils
 import android.widget.*
 import com.example.cookieclicker.controllers.GameController
 import com.example.cookieclicker.R
@@ -26,7 +28,7 @@ class GameActivity : AppCompatActivity() {
     */
     private var controller = GameController(this)
 
-    lateinit var chronometer: Chronometer
+    private lateinit var chronometer: Chronometer
     private var chronometerRunning = false
     private var chronometerPauseOffset = 0L
 
@@ -44,7 +46,11 @@ class GameActivity : AppCompatActivity() {
         rightImage = findViewById(R.id.RightImageView)
 
         setupChronometer()
-        setupUpgradesList()
+        //setupUpgradesList()
+        val popup = setupUpgradeListV2()
+        upgradeButton.setOnClickListener {
+            popup.showAsDropDown(it, -5, 0)
+        }
         setupButtons()
 
         controller.onPointsChanged.plusAssign { scoreCurrent.text = controller.score.toString() }
@@ -53,7 +59,7 @@ class GameActivity : AppCompatActivity() {
         displayIntroductionPopup()
     }
 
-    fun setupButtons() {
+    private fun setupButtons() {
         cookieButton1.setOnClickListener {
             controller.grantPoints(controller.list[0])
             handleAnimation(leftImage)
@@ -67,7 +73,7 @@ class GameActivity : AppCompatActivity() {
         }
     }
 
-    fun setupUpgradesList() {
+    private fun setupUpgradesList() {
         spinner = findViewById(R.id.spinner)
         val adapter = ArrayAdapter(
             this,
@@ -81,7 +87,7 @@ class GameActivity : AppCompatActivity() {
             }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                var item = parent?.getItemAtPosition(position)
+                val item = parent?.getItemAtPosition(position)
                 if (item is IBonusGenerator) {
                     controller.upgrade(item)
                 }
@@ -89,19 +95,48 @@ class GameActivity : AppCompatActivity() {
         }
     }
 
-    fun setupChronometer() {
+    private fun setupUpgradeListV2(): PopupWindow {
+        val popupWindow = PopupWindow(this)
+        val listView = ListView(this)
+        listView.adapter = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, controller.list)
+        listView.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun onItemSelected(parent: AdapterView<*>?, view: View, position: Int, id: Long) {
+                val fadeInAnimation = AnimationUtils.loadAnimation(view.context, android.R.anim.fade_in)
+                fadeInAnimation.duration = 10
+                popupWindow.dismiss()
+                val item = parent?.getItemAtPosition(position)
+                if (item is IBonusGenerator) {
+                    controller.upgrade(item)
+                }
+            }
+
+
+        }
+        popupWindow.isFocusable = true
+        popupWindow.width
+        popupWindow.height = WindowManager.LayoutParams.WRAP_CONTENT
+        popupWindow.contentView = listView
+        return popupWindow
+
+    }
+
+    private fun setupChronometer() {
         chronometer = findViewById(R.id.chronometer)
         chronometer.setOnChronometerTickListener { controller.grantPoints(controller.list[2]) }
         controller.onTimeModified.plusAssign { modifyChronometerTime(it) }
 
     }
 
-    fun displayIntroductionPopup() {
+    private fun displayIntroductionPopup() {
         val dialog = AlertDialog.Builder(this)
         val alertView = layoutInflater.inflate(R.layout.dialog_username, null)
         val username: EditText = alertView.findViewById(R.id.username_text)
         val start = alertView.findViewById<Button>(R.id.start)
-        var alertDialog = dialog.setView(alertView).create()
+        val alertDialog = dialog.setView(alertView).create()
 
         start.setOnClickListener {
             if (!username.text.toString().isEmpty()) {
@@ -120,6 +155,7 @@ class GameActivity : AppCompatActivity() {
         startChronometer()
 
     }
+
     override fun onPause() {
         super.onPause()
         if (!PreferenceManager.getDefaultSharedPreferences(this).getBoolean("RunInBackground", false)) {
