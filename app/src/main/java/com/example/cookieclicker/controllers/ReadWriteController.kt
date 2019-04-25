@@ -25,6 +25,7 @@ class ReadWriteController(activity: Context) {
     fun resetHighScores(){
         highScores.clear()
         writeFile()
+        getHighScores()
     }
 
     fun addHighScore(name: String, score: Int) {

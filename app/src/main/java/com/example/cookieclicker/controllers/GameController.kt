@@ -1,6 +1,7 @@
 package com.example.cookieclicker.controllers
 
 import android.content.Context
+import android.widget.Chronometer
 import com.example.cookieclicker.controllers.bonusGenerators.*
 
 //C# Events equivalent
@@ -26,7 +27,7 @@ class GameController {
 
     //VariableFields
     var score = 0f
-    private val scoreLimit = 1000;
+    private val scoreLimit = 100;
     var username = "Anonymous"
     private var incomeModifier = 1f
     //
@@ -43,19 +44,22 @@ class GameController {
 
     //should i use it?
     private var ContextActivity: Context
-
-    constructor(activity: Context) {
+    private val chronometer:Chronometer
+    constructor(activity: Context,chronometer: Chronometer) {
         this.ContextActivity = activity
+        this.chronometer=chronometer
     }
 
 
     private fun finnishGame() {
-        checkForHighScore()
+        checkForHighScore(chronometer.base.toInt())
         onGameFinished.invoke("End!")
     }
 
-    fun checkForHighScore() {
-
+    fun checkForHighScore(time:Int) {
+        val highscoresController=ReadWriteController(ContextActivity)
+        highscoresController.getHighScores()
+        highscoresController.addHighScore(username,time)
     }
 
     fun changeIncomeModifier(newModifier: Float) {

@@ -13,9 +13,15 @@ class RankingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_ranking)
-        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, readWriteController.getHighScores())
+        displayHighScores()
+        resetHighscoresButton.setOnClickListener {
+            readWriteController.resetHighScores()
+            displayHighScores()
+        }
+    }
 
+    private fun displayHighScores() {
+        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, readWriteController.getHighScores())
         highscore_list.adapter = adapter
-        resetHighscoresButton.setOnClickListener { readWriteController.resetHighScores() }
     }
 }

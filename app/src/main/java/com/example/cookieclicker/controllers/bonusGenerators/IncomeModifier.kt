@@ -35,7 +35,6 @@ class IncomeModifier : IBonusGenerator {
     }
 
     override fun toString(): String {
-        if (_currentBonusIndex + 1 > _bonuses.lastIndex) return "Maximum upgrade reached"
         return "Upgrade to .NET Core ${_displayStrings[_currentBonusIndex]}: Income Bonus->x${_bonuses[_currentBonusIndex]} for ${_costs[_currentBonusIndex]}/10s"
     }
 }
