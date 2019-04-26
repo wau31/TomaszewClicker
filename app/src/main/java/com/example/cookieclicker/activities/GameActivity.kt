@@ -75,27 +75,27 @@ class GameActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupUpgradesList() {
-        spinner = findViewById(R.id.spinner)
-        val adapter = ArrayAdapter(
-            this,
-            R.layout.support_simple_spinner_dropdown_item, controller.list
-        )
-        adapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item)
-        spinner.adapter = adapter
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-
-            }
-
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val item = parent?.getItemAtPosition(position)
-                if (item is IBonusGenerator) {
-                    controller.upgrade(item)
-                }
-            }
-        }
-    }
+//    private fun setupUpgradesList() {
+//        spinner = findViewById(R.id.spinner)
+//        val adapter = ArrayAdapter(
+//            this,
+//            R.layout.support_simple_spinner_dropdown_item, controller.list
+//        )
+//        adapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item)
+//        spinner.adapter = adapter
+//        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+//            override fun onNothingSelected(parent: AdapterView<*>?) {
+//
+//            }
+//
+//            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+//                val item = parent?.getItemAtPosition(position)
+//                if (item is IBonusGenerator) {
+//                    controller.upgrade(item)
+//                }
+//            }
+//        }
+//    }
 
     private fun setupUpgradeListV2(): PopupWindow {
         val popupWindow = PopupWindow(this)

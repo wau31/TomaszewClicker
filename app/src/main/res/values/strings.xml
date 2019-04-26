@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">CookieClicker</string>
+    <string name="app_name">Tomaszew Clicker</string>
     <string name="app_settings_path">com.example.cookieclicker.AppSettings</string>
 </resources>
