@@ -1,16 +1,21 @@
 package com.example.cookieclicker.activities
 
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.ActivityOptions
 import android.content.Intent
+import android.graphics.Point
 import android.os.Bundle
 import android.os.SystemClock
 import android.preference.PreferenceManager
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.util.DisplayMetrics
 import android.view.View
 import android.view.WindowManager
+import android.view.animation.AccelerateInterpolator
 import android.view.animation.AnimationUtils
+import android.view.animation.LinearInterpolator
 import android.widget.*
 import com.example.cookieclicker.controllers.GameController
 import com.example.cookieclicker.R
@@ -47,8 +52,8 @@ class GameActivity : AppCompatActivity() {
         rightImage = findViewById(R.id.RightImageView)
 
         setupController()
-        //setupUpgradesList()
-        val popup = setupUpgradeListV2()
+
+        val popup = setupUpgradeList()
         upgradeButton.setOnClickListener {
             popup.showAsDropDown(it, -5, 0)
         }
@@ -75,29 +80,8 @@ class GameActivity : AppCompatActivity() {
         }
     }
 
-//    private fun setupUpgradesList() {
-//        spinner = findViewById(R.id.spinner)
-//        val adapter = ArrayAdapter(
-//            this,
-//            R.layout.support_simple_spinner_dropdown_item, controller.list
-//        )
-//        adapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item)
-//        spinner.adapter = adapter
-//        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-//            override fun onNothingSelected(parent: AdapterView<*>?) {
-//
-//            }
-//
-//            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-//                val item = parent?.getItemAtPosition(position)
-//                if (item is IBonusGenerator) {
-//                    controller.upgrade(item)
-//                }
-//            }
-//        }
-//    }
 
-    private fun setupUpgradeListV2(): PopupWindow {
+    private fun setupUpgradeList(): PopupWindow {
         val popupWindow = PopupWindow(this)
 
         val listView = ListView(this)
@@ -116,6 +100,7 @@ class GameActivity : AppCompatActivity() {
         popupWindow.isFocusable = true
         popupWindow.width
         popupWindow.height = WindowManager.LayoutParams.WRAP_CONTENT
+        //popupWindow.setBackgroundDrawable(getDrawable(resources.))
         popupWindow.contentView = listView
         return popupWindow
 
@@ -124,7 +109,8 @@ class GameActivity : AppCompatActivity() {
     private fun setupController() {
         chronometer = findViewById(R.id.chronometer)
         controller = GameController(this, chronometer)
-        chronometer.setOnChronometerTickListener { controller.grantPoints(controller.list[2]) }
+        controller.setup()
+        //chronometer.setOnChronometerTickListener { controller.grantPoints(controller.list[2]) }
         controller.onTimeModified.plusAssign { modifyChronometerTime(it) }
 
     }
@@ -179,10 +165,45 @@ class GameActivity : AppCompatActivity() {
         startChronometer()
     }
 
-    private fun handleAnimation(ImageView: ImageView) {
-        ImageView.clearAnimation()
-        ImageView.animate().translationYBy(-300f).scaleX(1.2f).scaleY(1.2f).alpha(0f).duration = 500
+//    private fun handleAnimation(ImageView: ImageView) {
+//        ImageView.clearAnimation()
+//        ImageView.animate().translationYBy(-300f).scaleX(1.2f).scaleY(1.2f).alpha(0f).duration = 500
+//
+//    }
 
+    private fun handleAnimation(ImageView: ImageView) {
+        val displayMetrics=DisplayMetrics()
+        val display = windowManager.defaultDisplay.getMetrics(displayMetrics)
+        val height=displayMetrics.heightPixels.toFloat()
+
+        val yAnimator = ValueAnimator.ofFloat(0f, -height/2)
+        val alphaAnimator =ValueAnimator.ofFloat(0f,1f)
+        val scaleAnimator=ValueAnimator.ofFloat(1f,2f)
+
+        yAnimator.addUpdateListener {
+            val value=it.animatedValue as Float
+            ImageView.translationY=value
+
+        }
+        alphaAnimator.addUpdateListener {
+            val value=it.animatedValue as Float
+            ImageView.alpha=value
+        }
+        scaleAnimator.addUpdateListener {
+            val value=it.animatedValue as Float
+            ImageView.scaleX=value
+            ImageView.scaleY=value
+        }
+        val accelerateInterpolator=AccelerateInterpolator(1.5f)
+        alphaAnimator.interpolator=accelerateInterpolator
+        yAnimator.interpolator=accelerateInterpolator
+        scaleAnimator.interpolator=accelerateInterpolator
+        yAnimator.duration=1000
+        alphaAnimator.duration=1000
+        scaleAnimator.duration=1000
+        yAnimator.start()
+        alphaAnimator.start()
+        scaleAnimator.start()
     }
 
     private fun startActivity() {

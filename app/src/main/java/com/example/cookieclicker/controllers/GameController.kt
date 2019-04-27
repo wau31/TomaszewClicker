@@ -1,6 +1,9 @@
 package com.example.cookieclicker.controllers
 
+import android.app.IntentService
+import android.app.Service
 import android.content.Context
+import android.os.SystemClock
 import android.widget.Chronometer
 import com.example.cookieclicker.controllers.bonusGenerators.*
 
@@ -20,6 +23,7 @@ class Event<T> {
 class GameController {
 
     //GameEvents
+    val onGameStarted=Event<String>()
     val onGameFinished = Event<String>()
     val onPointsChanged = Event<String>()
     val onTimeModified=Event<Long>()
@@ -43,21 +47,24 @@ class GameController {
     )
 
     //should i use it?
-    private var ContextActivity: Context
+    private var context: Context
     private val chronometer:Chronometer
+
     constructor(activity: Context,chronometer: Chronometer) {
-        this.ContextActivity = activity
+        this.context = activity
         this.chronometer=chronometer
     }
 
-
+    fun setup(){
+        chronometer.setOnChronometerTickListener { grantPoints(list[2]) }
+    }
     private fun finnishGame() {
         checkForHighScore(chronometer.base.toInt())
         onGameFinished.invoke("End!")
     }
 
     fun checkForHighScore(time:Int) {
-        val highscoresController=ReadWriteController(ContextActivity)
+        val highscoresController=ReadWriteController(context)
         highscoresController.getHighScores()
         highscoresController.addHighScore(username,time)
     }
