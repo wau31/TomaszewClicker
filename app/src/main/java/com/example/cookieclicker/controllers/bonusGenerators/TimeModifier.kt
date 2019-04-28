@@ -23,7 +23,7 @@ class TimeModifier : IBonusGenerator {
     }
 
     override fun toString(): String {
-        return "GIT reset --hard: Go back in time ${_bonus}s  for $_cost"
+        return "GIT reset --hard: Go back in time ${_bonus/1000}s  for $_cost"
     }
 
 }

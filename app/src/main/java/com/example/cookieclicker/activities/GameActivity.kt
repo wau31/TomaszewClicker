@@ -1,10 +1,12 @@
 package com.example.cookieclicker.activities
 
+import android.animation.AnimatorInflater
+import android.animation.AnimatorSet
 import android.animation.ValueAnimator
-import android.annotation.SuppressLint
 import android.app.ActivityOptions
 import android.content.Intent
-import android.graphics.Point
+import android.graphics.Color
+import android.graphics.drawable.AnimationDrawable
 import android.os.Bundle
 import android.os.SystemClock
 import android.preference.PreferenceManager
@@ -15,12 +17,18 @@ import android.view.View
 import android.view.WindowManager
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.AnimationUtils
-import android.view.animation.LinearInterpolator
 import android.widget.*
 import com.example.cookieclicker.controllers.GameController
 import com.example.cookieclicker.R
 import com.example.cookieclicker.controllers.bonusGenerators.IBonusGenerator
 import kotlinx.android.synthetic.main.activity_game.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
+enum class FaceAnimationType {
+    ANGRY, SURPRISED
+}
 
 class GameActivity : AppCompatActivity() {
     /*concepts of upgrades:
@@ -30,7 +38,6 @@ class GameActivity : AppCompatActivity() {
     - +X sec +Y points DeploySolution
     - timer -X sec git reset --hard
     - -X sec -Y points CodeReview
-
     */
 
     private lateinit var controller: GameController
@@ -41,15 +48,15 @@ class GameActivity : AppCompatActivity() {
 
     private lateinit var leftImage: ImageView
     private lateinit var rightImage: ImageView
-    private lateinit var spinner: Spinner
+    private lateinit var faceImage: ImageView
 
-    @SuppressLint("InflateParams")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
 
         leftImage = findViewById(R.id.LeftImageView)
         rightImage = findViewById(R.id.RightImageView)
+        faceImage = findViewById(R.id.faceImage)
 
         setupController()
 
@@ -58,7 +65,6 @@ class GameActivity : AppCompatActivity() {
             popup.showAsDropDown(it, -5, 0)
         }
         setupButtons()
-
 
         controller.onPointsChanged.plusAssign { scoreCurrent.text = controller.score.toString() }
         controller.onGameFinished.plusAssign { finnishActivity() }
@@ -85,22 +91,31 @@ class GameActivity : AppCompatActivity() {
         val popupWindow = PopupWindow(this)
 
         val listView = ListView(this)
+        popupWindow.width= ListPopupWindow.MATCH_PARENT
         listView.adapter = ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, controller.list)
-        listView.setOnItemClickListener { parent, view, position, id ->
+        listView.setBackgroundColor(Color.WHITE)
+        listView.setOnItemClickListener { parent, view, position, _ ->
 
             val fadeInAnimation = AnimationUtils.loadAnimation(view.context, android.R.anim.fade_in)
             fadeInAnimation.duration = 10
             popupWindow.dismiss()
             val item = parent?.getItemAtPosition(position)
             if (item is IBonusGenerator) {
-                controller.upgrade(item)
+                val result = controller.upgrade(item)
+                if (result) {
+                    Toast.makeText(this, "Upgrade purchased", Toast.LENGTH_SHORT).show()
+                    handleFaceAnimation(FaceAnimationType.SURPRISED)
+                } else {
+                    Toast.makeText(this, "Insufficient points", Toast.LENGTH_LONG).show()
+                    handleFaceAnimation(FaceAnimationType.ANGRY)
+                }
+
             }
         }
 
         popupWindow.isFocusable = true
         popupWindow.width
         popupWindow.height = WindowManager.LayoutParams.WRAP_CONTENT
-        //popupWindow.setBackgroundDrawable(getDrawable(resources.))
         popupWindow.contentView = listView
         return popupWindow
 
@@ -110,7 +125,6 @@ class GameActivity : AppCompatActivity() {
         chronometer = findViewById(R.id.chronometer)
         controller = GameController(this, chronometer)
         controller.setup()
-        //chronometer.setOnChronometerTickListener { controller.grantPoints(controller.list[2]) }
         controller.onTimeModified.plusAssign { modifyChronometerTime(it) }
 
     }
@@ -121,15 +135,13 @@ class GameActivity : AppCompatActivity() {
         val username: EditText = alertView.findViewById(R.id.username_text)
         val start = alertView.findViewById<Button>(R.id.start)
         val alertDialog = dialog.setView(alertView).create()
-
         start.setOnClickListener {
-            if (!username.text.toString().isEmpty()) {
+            if (username.text.toString().isNotEmpty()) {
                 controller.username = username.text.toString()
             }
             startActivity()
             alertDialog.dismiss()
         }
-
         alertDialog.show()
     }
 
@@ -150,7 +162,6 @@ class GameActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         startChronometer()
-
     }
 
     override fun onPause() {
@@ -165,46 +176,97 @@ class GameActivity : AppCompatActivity() {
         startChronometer()
     }
 
-//    private fun handleAnimation(ImageView: ImageView) {
-//        ImageView.clearAnimation()
-//        ImageView.animate().translationYBy(-300f).scaleX(1.2f).scaleY(1.2f).alpha(0f).duration = 500
-//
-//    }
-
     private fun handleAnimation(ImageView: ImageView) {
-        val displayMetrics=DisplayMetrics()
-        val display = windowManager.defaultDisplay.getMetrics(displayMetrics)
-        val height=displayMetrics.heightPixels.toFloat()
+        val displayMetrics = DisplayMetrics()
+        windowManager.defaultDisplay.getMetrics(displayMetrics)
+        val height = displayMetrics.heightPixels.toFloat()
+        var width = displayMetrics.heightPixels.toFloat()
 
-        val yAnimator = ValueAnimator.ofFloat(0f, -height/2)
-        val alphaAnimator =ValueAnimator.ofFloat(0f,1f)
-        val scaleAnimator=ValueAnimator.ofFloat(1f,2f)
+        width = when (ImageView) {
+            LeftImageView -> width
+            else -> -width
+        }
 
+        val yAnimator = ValueAnimator.ofFloat(0f, -height / 2)
+        val xAnimator = ValueAnimator.ofFloat(0f, width / 2)
+        val alphaAnimator = ValueAnimator.ofFloat(1f, 0f)
+        val scaleAnimator = ValueAnimator.ofFloat(1f, 2f)
+
+        xAnimator.addUpdateListener {
+            val value = it.animatedValue as Float
+            ImageView.translationX = value
+        }
         yAnimator.addUpdateListener {
-            val value=it.animatedValue as Float
-            ImageView.translationY=value
-
+            val value = it.animatedValue as Float
+            ImageView.translationY = value
         }
         alphaAnimator.addUpdateListener {
-            val value=it.animatedValue as Float
-            ImageView.alpha=value
+            val value = it.animatedValue as Float
+            ImageView.alpha = value
         }
         scaleAnimator.addUpdateListener {
-            val value=it.animatedValue as Float
-            ImageView.scaleX=value
-            ImageView.scaleY=value
+            val value = it.animatedValue as Float
+            ImageView.scaleX = value
+            ImageView.scaleY = value
         }
-        val accelerateInterpolator=AccelerateInterpolator(1.5f)
-        alphaAnimator.interpolator=accelerateInterpolator
-        yAnimator.interpolator=accelerateInterpolator
-        scaleAnimator.interpolator=accelerateInterpolator
-        yAnimator.duration=1000
-        alphaAnimator.duration=1000
-        scaleAnimator.duration=1000
+        val accelerateInterpolator = AccelerateInterpolator(1.5f)
+        xAnimator.interpolator = accelerateInterpolator
+        alphaAnimator.interpolator = accelerateInterpolator
+        yAnimator.interpolator = accelerateInterpolator
+        scaleAnimator.interpolator = accelerateInterpolator
+
+        xAnimator.duration = 1200
+        yAnimator.duration = 1000
+        alphaAnimator.duration = 1000
+        scaleAnimator.duration = 500
+        ImageView.visibility = View.VISIBLE
+
+        xAnimator.start()
         yAnimator.start()
         alphaAnimator.start()
         scaleAnimator.start()
     }
+
+    private fun handleFaceAnimation(type: FaceAnimationType) {
+
+        when (type) {
+            FaceAnimationType.SURPRISED -> {
+                faceImage.setBackgroundResource(R.drawable.face_animation)
+                val animation=faceImage.background as AnimationDrawable
+                animation.start()
+                GlobalScope.launch {
+                    delay(1000)
+                    animation.stop()
+                    resetFaceAnimation()
+                }
+            }
+
+            FaceAnimationType.ANGRY->{
+                faceImage.setBackgroundResource(R.drawable.face_angry)
+                val animation=AnimatorInflater.loadAnimator(this,R.animator.angry_face_shake) as AnimatorSet
+                //TODO Shake doesnt work...
+                animation.setTarget(faceImage)
+                animation.duration=1000
+                animation.start()
+                GlobalScope.launch {
+                    delay(1000)
+                    resetFaceAnimation()
+                }
+
+            }
+
+            else ->return
+        }
+
+
+
+    }
+
+
+    private fun resetFaceAnimation() {
+        faceImage.setBackgroundResource(R.drawable.face_default)
+    }
+
 
     private fun startActivity() {
 
@@ -214,6 +276,10 @@ class GameActivity : AppCompatActivity() {
         cookieButton2.isEnabled = true
         cookieButton2.visibility = View.VISIBLE
 
+        LeftImageView.visibility = View.GONE
+        RightImageView.visibility = View.GONE
+
+        resetFaceAnimation()
     }
 
     private fun finnishActivity() {

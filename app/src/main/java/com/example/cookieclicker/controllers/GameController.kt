@@ -20,10 +20,9 @@ class Event<T> {
 }
 
 
-class GameController {
+class GameController(activity: Context, private val chronometer: Chronometer) {
 
     //GameEvents
-    val onGameStarted=Event<String>()
     val onGameFinished = Event<String>()
     val onPointsChanged = Event<String>()
     val onTimeModified=Event<Long>()
@@ -31,7 +30,7 @@ class GameController {
 
     //VariableFields
     var score = 0f
-    private val scoreLimit = 100;
+    private val scoreLimit = 100
     var username = "Anonymous"
     private var incomeModifier = 1f
     //
@@ -47,13 +46,7 @@ class GameController {
     )
 
     //should i use it?
-    private var context: Context
-    private val chronometer:Chronometer
-
-    constructor(activity: Context,chronometer: Chronometer) {
-        this.context = activity
-        this.chronometer=chronometer
-    }
+    private var context: Context = activity
 
     fun setup(){
         chronometer.setOnChronometerTickListener { grantPoints(list[2]) }
@@ -63,14 +56,14 @@ class GameController {
         onGameFinished.invoke("End!")
     }
 
-    fun checkForHighScore(time:Int) {
+    private fun checkForHighScore(time:Int) {
         val highscoresController=ReadWriteController(context)
         highscoresController.getHighScores()
         highscoresController.addHighScore(username,time)
     }
 
     fun changeIncomeModifier(newModifier: Float) {
-        incomeModifier = newModifier;
+        incomeModifier = newModifier
     }
 
     fun grantPoints(generator: IBonusGenerator) {
@@ -83,13 +76,14 @@ class GameController {
         }
     }
 
-    fun upgrade(generator: IBonusGenerator) {
+    fun upgrade(generator: IBonusGenerator):Boolean {
         if (score >= generator.upgradeCost) {
             score -= generator.upgradeCost
             onPointsChanged.invoke(score.toString())
             generator.Upgrade()
-
+            return true
         }
+        return false
     }
 
 }

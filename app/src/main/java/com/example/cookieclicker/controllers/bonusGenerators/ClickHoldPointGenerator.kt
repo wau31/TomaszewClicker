@@ -18,6 +18,6 @@ class ClickHoldPointGenerator: IBonusGenerator {
 
     override fun toString(): String {
         if (currentBonusIndex+1>_bonuses.lastIndex) return "Maximum upgrade reached"
-        return "Upgrade .NET to .NET ${_displayStrings[currentBonusIndex+1]}: LongClickBonus->${_bonuses[currentBonusIndex+1]} for ${_costs[currentBonusIndex+1]}"
+        return "Upgrade to .NET ${_displayStrings[currentBonusIndex+1]}: LongClickBonus->${_bonuses[currentBonusIndex+1]} for ${_costs[currentBonusIndex+1]}"
     }
 }
